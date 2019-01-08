@@ -1,0 +1,40 @@
+    <editor>
+       <label>Invoke JMeter Test</label>
+	   <help>/commander/pages/@PLUGIN_NAME@/@PLUGIN_KEY@_help?s=Administration&amp;ss=Plugins#runJMeter
+		</help> 
+        <formElement>
+            <type>entry</type>
+            <label>Working Directory</label>
+            <property>workingdirectory</property>
+            <required>1</required>
+            <documentation>Indicate the directory where the jmx test file resides.</documentation>
+        </formElement> 
+        <formElement>
+            <type>entry</type>
+            <label>JMeter File</label>
+            <property>jmeterFile</property>
+            <required>1</required>
+            <documentation>Provide the name of the jmx test file to execute.(This is the command-line '-t ' option)</documentation>
+         </formElement>
+           <formElement>
+            <type>entry</type>
+            <label>Server</label>
+            <property>server</property>
+            <required>0</required>
+            <documentation>Provide the name of the remote server where the jmx file resides.(This is the command-line '-l ' option)</documentation>
+        </formElement>
+        <formElement>
+            <type>entry</type>
+            <label>Log File</label>
+            <property>logFile</property>
+            <required>0</required>
+            <documentation>Provide the name of the file for the test results.(This is the command-line '-R' option)</documentation>
+        </formElement>
+        <formElement>
+            <type>entry</type>
+            <label>Additional Options</label>
+            <property>additionalOptions</property>
+            <required>0</required>
+            <documentation>Provide any additional options to add to the jmeter command.</documentation>
+        </formElement>
+    </editor>

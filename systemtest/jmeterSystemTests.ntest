@@ -1,0 +1,274 @@
+# -*-Perl-*-
+
+# jmeterSystemTests.ntest -
+#
+# ECJMeter
+#
+# Copyright (c) 2005-2010 Electric Cloud, Inc.
+# All rights reserved
+
+use strict;
+use warnings;
+use ECTest;
+use ECSelenium;
+
+ 
+# system tests
+
+
+require "$::gTestFileDir/jmeter-common.ntest";
+
+$::gProjectImported = 0;
+$::gtestProjectName = 'JMeterTest';
+
+my $outcome = '';
+
+########################################################################
+# importProject - imports the test project and asserts that the specified
+#                 procedures exists
+#
+# Arguments:
+#   -none
+#
+# Returns:
+#   -nothing
+#
+########################################################################
+sub importProject() {
+    assertOK($::N->import(
+             { file =>"$::gTestFileDir/jmeterTest.xml",
+               path  => "/projects/JMeterTest",
+               force => 1
+             } ), 'import runCommandLine');
+   
+    assertOK($::N->getProcedure($::gtestProjectName, 'allOptionsJMeterLocalTest'),
+    'allOptionsJMeterLocalTest procedure doesn\'t exist');
+    
+    assertOK($::N->getProcedure($::gtestProjectName, 'allOptionsJMeterRemoteTest'),
+    'allOptionsJMeterRemoteTest procedure doesn\'t exist');
+    
+    assertOK($::N->getProcedure($::gtestProjectName, 'defaultJMeterLocalTest'),
+    'defaultJMeterLocalTest procedure doesn\'t exist');
+    
+    assertOK($::N->getProcedure($::gtestProjectName, 'defaultJMeterRemoteTest'),
+    'defaultJMeterRemoteTest procedure doesn\'t exist');  
+    $::gProjectImported = 1;
+}
+
+########################################################################
+# doSetup - invokes the project import method in case it hasn't been 
+#           executed
+#
+# Arguments:
+#   -none
+#
+# Returns:
+#   -nothing
+#
+########################################################################
+sub doSetup() {
+
+    if(! $::gProjectImported) {
+        importProject();
+    }
+    
+    
+}
+
+ntest "allOptionsJMeterLocalTest", {}, sub {
+      
+      doSetup();
+      
+      # run test job
+     
+      my $xpath = $::N->runProcedure($::gtestProjectName, 
+              {procedureName => "allOptionsJMeterLocalTest",
+              pollInterval  => '1',
+              timeout => 1200,
+                   actualParameter => [
+                  
+                  ]
+      });
+          
+       
+      # make sure it finished
+      my $jobId = 0;
+      my $status = '';
+      
+      assertOK($xpath, 'runProcedure has errors');
+      if ($xpath) {
+          $jobId  = $xpath->findvalue("//jobId");
+          $status = $xpath->findvalue("//status");
+          $outcome = $xpath->findvalue("//outcome");
+  
+          assertTrue($jobId && $jobId ne "",'valid job id');
+          assertEq('completed',$status,"job $jobId complete");
+  
+          #abort if job did not finish
+          if ($status ne 'completed') {
+              assertOK($::N->abortJob($jobId, {force => 1}));
+          }
+      }
+
+      # get the job details
+      $xpath = $::N->getJobDetails($jobId);
+   
+      # get the value of the commands lines
+      my $commandLine = $xpath->findvalue("//property[propertyName='commandLine']/value");
+      my $workingDir = $xpath->findvalue("//property[propertyName='workingdirectory']/value");
+
+      assertEq($commandLine, 'jmeter -n -t "PlanPruebas.jmx" -l C:\jakarta-jmeter-2.4\bin\results -p jmeter.properties', 
+           'command line doesn\'t match expected output');
+           
+      assertEq($workingDir, 'C:\jakarta-jmeter-2.4\bin', 
+           'working directory doesn\'t match expected output');
+
+  };
+ntest "allOptionsJMeterRemoteTest", {}, sub {
+      
+      doSetup();
+      
+      # run test job
+     
+      my $xpath = $::N->runProcedure($::gtestProjectName, 
+              {procedureName => "allOptionsJMeterRemoteTest",
+              pollInterval  => '1',
+              timeout => 1200,
+                   actualParameter => [
+                  
+                  ]
+      });
+          
+       
+      # make sure it finished
+      my $jobId = 0;
+      my $status = '';
+      
+      assertOK($xpath, 'runProcedure has errors');
+      if ($xpath) {
+          $jobId  = $xpath->findvalue("//jobId");
+          $status = $xpath->findvalue("//status");
+          $outcome = $xpath->findvalue("//outcome");
+  
+          assertTrue($jobId && $jobId ne "",'valid job id');
+          assertEq('completed',$status,"job $jobId complete");
+  
+          #abort if job did not finish
+          if ($status ne 'completed') {
+              assertOK($::N->abortJob($jobId, {force => 1}));
+          }
+      }
+
+      # get the job details
+      $xpath = $::N->getJobDetails($jobId);
+   
+      # get the value of the commands lines
+      my $commandLine = $xpath->findvalue("//property[propertyName='commandLine']/value");
+      my $workingDir = $xpath->findvalue("//property[propertyName='workingdirectory']/value");
+
+      assertEq($commandLine, 'jmeter -n -t "\jcastro\PlanPruebas.jmx" -l C:\results -R jcastro -p jmeter.properties', 
+           'command line doesn\'t match expected output');
+           
+      assertEq($workingDir, 'C:\jakarta-jmeter-2.4', 
+           'working directory doesn\'t match expected output');
+
+  };
+  
+ntest "defaultJMeterLocalTest", {}, sub {
+      
+      doSetup();
+      
+      # run test job
+     
+      my $xpath = $::N->runProcedure($::gtestProjectName, 
+              {procedureName => "defaultJMeterLocalTest",
+              pollInterval  => '1',
+              timeout => 1200,
+                   actualParameter => [
+                  
+                  ]
+      });
+          
+       
+      # make sure it finished
+      my $jobId = 0;
+      my $status = '';
+      
+      assertOK($xpath, 'runProcedure has errors');
+      if ($xpath) {
+          $jobId  = $xpath->findvalue("//jobId");
+          $status = $xpath->findvalue("//status");
+          $outcome = $xpath->findvalue("//outcome");
+  
+          assertTrue($jobId && $jobId ne "",'valid job id');
+          assertEq('completed',$status,"job $jobId complete");
+  
+          #abort if job did not finish
+          if ($status ne 'completed') {
+              assertOK($::N->abortJob($jobId, {force => 1}));
+          }
+      }
+
+      # get the job details
+      $xpath = $::N->getJobDetails($jobId);
+   
+      # get the value of the commands lines
+      my $commandLine = $xpath->findvalue("//property[propertyName='commandLine']/value");
+      my $workingDir = $xpath->findvalue("//property[propertyName='workingdirectory']/value");
+
+      assertEq($commandLine, 'jmeter -n -t "PlanPruebas.jmx"', 
+           'command line doesn\'t match expected output');
+           
+      assertEq($workingDir, 'C:\jakarta-jmeter-2.4\bin', 
+           'working directory doesn\'t match expected output');
+
+  };
+ntest "defaultJMeterRemoteTest", {}, sub {
+      
+      doSetup();
+      
+      # run test job
+     
+      my $xpath = $::N->runProcedure($::gtestProjectName, 
+              {procedureName => "defaultJMeterRemoteTest",
+              pollInterval  => '1',
+              timeout => 1200,
+                   actualParameter => [
+                  
+                  ]
+      });
+          
+       
+      # make sure it finished
+      my $jobId = 0;
+      my $status = '';
+      
+      assertOK($xpath, 'runProcedure has errors');
+      if ($xpath) {
+          $jobId  = $xpath->findvalue("//jobId");
+          $status = $xpath->findvalue("//status");
+          $outcome = $xpath->findvalue("//outcome");
+  
+          assertTrue($jobId && $jobId ne "",'valid job id');
+          assertEq('completed',$status,"job $jobId complete");
+  
+          #abort if job did not finish
+          if ($status ne 'completed') {
+              assertOK($::N->abortJob($jobId, {force => 1}));
+          }
+      }
+
+      # get the job details
+      $xpath = $::N->getJobDetails($jobId);
+   
+      # get the value of the commands lines
+      my $commandLine = $xpath->findvalue("//property[propertyName='commandLine']/value");
+      my $workingDir = $xpath->findvalue("//property[propertyName='workingdirectory']/value");
+
+      assertEq($commandLine, 'jmeter -n -t "\jcastro\bin\PlanPruebas.jmx" -R jcastro', 
+           'command line doesn\'t match expected output');
+           
+      assertEq($workingDir, 'C:\jakarta-jmeter-2.4', 
+           'working directory doesn\'t match expected output');
+
+  };
